@@ -5,7 +5,7 @@
 
   <groupId>app.coronawarn.testresult</groupId>
   <artifactId>cwa-testresult-server</artifactId>
-  <version>0.3.5-SNAPSHOT</version>
+  <version>1.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>cwa-testresult-server</name>
@@ -199,12 +199,41 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <executions>
           <execution>
+            <id>pre-integration-test</id>
+            <goals>
+              <goal>start</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>post-integration-test</id>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+          <execution>
             <goals>
               <goal>repackage</goal>
               <goal>build-info</goal>
             </goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.springdoc</groupId>
+        <artifactId>springdoc-openapi-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <apiDocsUrl>http://localhost:8080/api/docs</apiDocsUrl>
+          <outputFileName>openapi.json</outputFileName>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

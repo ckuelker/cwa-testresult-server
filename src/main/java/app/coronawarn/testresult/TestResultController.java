@@ -22,12 +22,12 @@
 package app.coronawarn.testresult;
 
 import app.coronawarn.testresult.model.TestResult;
+import app.coronawarn.testresult.model.TestResultList;
 import app.coronawarn.testresult.model.TestResultRequest;
 import app.coronawarn.testresult.model.TestResultResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import java.util.List;
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -65,13 +65,13 @@ public class TestResultController {
     log.info("Received test result request from app.");
     TestResult result = testResultService.getOrCreate(request.getId());
     return ResponseEntity.ok(new TestResultResponse()
-      .setTestResult(result.getResult() == null ? 0 : result.getResult()));
+      .setTestResult(result.getResult()));
   }
 
   /**
    * Insert or update the test results.
    *
-   * @param request the test result collection request
+   * @param list the test result list request
    * @return the response
    */
   @Operation(
@@ -83,10 +83,10 @@ public class TestResultController {
     produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<?> results(
-    @RequestBody @NotEmpty List<@Valid TestResult> request
+    @RequestBody @NotNull @Valid TestResultList list
   ) {
-    log.info("Received {} test results to insert or update from lab.", request.size());
-    request.forEach(testResultService::createOrUpdate);
+    log.info("Received {} test results to insert or update from lab.", list.getTestResults().size());
+    list.getTestResults().forEach(testResultService::createOrUpdate);
     return ResponseEntity.noContent().build();
   }
 }

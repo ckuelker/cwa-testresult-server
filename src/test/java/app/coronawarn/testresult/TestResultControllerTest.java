@@ -22,6 +22,7 @@
 package app.coronawarn.testresult;
 
 import app.coronawarn.testresult.model.TestResult;
+import app.coronawarn.testresult.model.TestResultList;
 import app.coronawarn.testresult.model.TestResultRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Collections;
@@ -59,7 +60,7 @@ public class TestResultControllerTest {
   }
 
   @Test
-  public void insertInvalidShouldReturnBadRequest() throws Exception {
+  public void insertInvalidIdShouldReturnBadRequest() throws Exception {
     // data
     String id = "";
     Integer result = 0;
@@ -77,14 +78,42 @@ public class TestResultControllerTest {
   }
 
   @Test
-  public void insertValidShouldReturnNoContent() throws Exception {
+  public void insertInvalidResultShouldReturnBadRequest() throws Exception {
     // data
     String id = "a".repeat(64);
+    // create
+    TestResultList invalid = new TestResultList().setTestResults(Collections.singletonList(
+      new TestResult().setId(id)
+    ));
+    mockMvc.perform(MockMvcRequestBuilders
+      .post("/api/v1/lab/results")
+      .accept(MediaType.APPLICATION_JSON_VALUE)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(objectMapper.writeValueAsString(invalid)))
+      .andDo(MockMvcResultHandlers.print())
+      .andExpect(MockMvcResultMatchers.status().isBadRequest());
+    // create
+    invalid = new TestResultList().setTestResults(Collections.singletonList(
+      new TestResult().setId(id).setResult(4)
+    ));
+    mockMvc.perform(MockMvcRequestBuilders
+      .post("/api/v1/lab/results")
+      .accept(MediaType.APPLICATION_JSON_VALUE)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(objectMapper.writeValueAsString(invalid)))
+      .andDo(MockMvcResultHandlers.print())
+      .andExpect(MockMvcResultMatchers.status().isBadRequest());
+  }
+
+  @Test
+  public void insertValidShouldReturnNoContent() throws Exception {
+    // data
+    String id = "b".repeat(64);
     Integer result = 1;
     // create
-    List<TestResult> valid = Collections.singletonList(
+    TestResultList valid = new TestResultList().setTestResults(Collections.singletonList(
       new TestResult().setId(id).setResult(result)
-    );
+    ));
     mockMvc.perform(MockMvcRequestBuilders
       .post("/api/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -97,39 +126,12 @@ public class TestResultControllerTest {
   @Test
   public void insertValidAndGetShouldReturnOk() throws Exception {
     // data
-    String id = "b".repeat(64);
+    String id = "c".repeat(64);
     Integer result = 1;
     // create
-    List<TestResult> valid = Collections.singletonList(
+    TestResultList valid = new TestResultList().setTestResults(Collections.singletonList(
       new TestResult().setId(id).setResult(result)
-    );
-    mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/lab/results")
-      .accept(MediaType.APPLICATION_JSON_VALUE)
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .content(objectMapper.writeValueAsString(valid)))
-      .andDo(MockMvcResultHandlers.print())
-      .andExpect(MockMvcResultMatchers.status().isNoContent());
-    // get
-    TestResultRequest request = new TestResultRequest()
-      .setId(id);
-    mockMvc.perform(MockMvcRequestBuilders
-      .post("/api/v1/app/result")
-      .accept(MediaType.APPLICATION_JSON_VALUE)
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .content(objectMapper.writeValueAsString(request)))
-      .andDo(MockMvcResultHandlers.print())
-      .andExpect(MockMvcResultMatchers.status().isOk());
-  }
-
-  @Test
-  public void insertValidPendingAndGetShouldReturnOk() throws Exception {
-    // data
-    String id = "b".repeat(64);
-    // create
-    List<TestResult> valid = Collections.singletonList(
-      new TestResult().setId(id)
-    );
+    ));
     mockMvc.perform(MockMvcRequestBuilders
       .post("/api/v1/lab/results")
       .accept(MediaType.APPLICATION_JSON_VALUE)
@@ -152,7 +154,7 @@ public class TestResultControllerTest {
   @Test
   public void notExistingTestResultShouldReturnOk() throws Exception {
     // data
-    String id = "b".repeat(64);
+    String id = "d".repeat(64);
     Integer result = 1;
     // create
     List<TestResult> valid = Collections.singletonList(

@@ -22,51 +22,34 @@
 package app.coronawarn.testresult.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
+import java.util.List;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
 /**
- * Model of the test result.
+ * Model of the test result list.
  */
 @Schema(
-  description = "The test result model."
+  description = "The test result list model."
 )
 @Getter
 @ToString
 @EqualsAndHashCode
-public class TestResult {
+public class TestResultList {
 
   /**
-   * Hash (SHA256) of test result id (aka QR-Code, GUID) encoded as hex string.
+   * The test result entries.
    */
-  @NotBlank
-  @Pattern(regexp = "^([A-Fa-f0-9]{2}){32}$")
-  private String id;
-
-  /**
-   * The test result.
-   * 1: negative
-   * 2: positive
-   * 3: invalid
-   */
-  @Min(1)
-  @Max(3)
   @NotNull
-  private Integer result;
+  @NotEmpty
+  private List<@Valid TestResult> testResults;
 
-  public TestResult setId(String id) {
-    this.id = id;
-    return this;
-  }
-
-  public TestResult setResult(Integer result) {
-    this.result = result;
+  public TestResultList setTestResults(List<TestResult> testResults) {
+    this.testResults = testResults;
     return this;
   }
 }
